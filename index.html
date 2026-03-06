@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFKD UI 카탈로그</title>
+<style>
+:root {
+  --bg: #0d1117; --surface: #161b22; --surface2: #1c2129;
+  --border: #30363d; --border-hi: #58a6ff;
+  --text: #e6edf3; --dim: #8b949e; --accent: #58a6ff;
+  --orange: #d29922; --green: #3fb950; --red: #f85149;
+  --purple: #bc8cff; --cyan: #56d4dd; --yellow: #e3b341;
+  --main-color: #1f6feb; --popup-color: #8b949e;
+  --status-red: #f85149; --status-yellow: #d29922;
+  --status-green: #3fb950; --status-gray: #484f58;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard',-apple-system,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.5; }
+
+/* ── 공통 ── */
+.page { padding:28px 32px; max-width:1320px; margin:0 auto; }
+.loading { text-align:center; padding:60px; color:var(--dim); font-size:14px; }
+.loading-spinner { display:inline-block; width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; margin-right:8px; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.hidden { display:none !important; }
+
+/* ── 인덱스 뷰 ── */
+.l0-header { margin-bottom:24px; }
+.l0-header h1 { font-size:22px; margin-bottom:6px; letter-spacing:-.3px; }
+.l0-header .sub { color:var(--dim); font-size:13px; }
+.l0-stats { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.l0-stat {
+  padding:14px 20px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  min-width:120px;
+}
+.l0-stat .num { font-size:24px; font-weight:700; color:var(--accent); letter-spacing:-.5px; }
+.l0-stat .label { font-size:11px; color:var(--dim); margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
+.cat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
+.cat-card {
+  display:block; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; cursor:pointer; transition:all .15s; position:relative; text-decoration:none; color:var(--text);
+}
+.cat-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 16px #00000055; }
+.cat-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.cat-count { font-size:11px; color:var(--dim); }
+.cat-badge {
+  position:absolute; top:10px; right:10px; font-size:9px; font-weight:700;
+  padding:3px 8px; border-radius:10px; background:#3fb95022; color:var(--green);
+}
+
+/* ── 카테고리 뷰 ── */
+.back-bar {
+  padding:10px 24px; background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; gap:16px;
+}
+.back-btn {
+  background:none; color:var(--accent); border:1px solid var(--border); border-radius:6px;
+  padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; gap:6px; transition:all .15s; text-decoration:none;
+}
+.back-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.back-bar .current-path { font-size:13px; color:var(--text); font-weight:600; }
+
+.l1-header { margin-bottom:24px; }
+.l1-header h2 { font-size:20px; font-weight:700; letter-spacing:-.3px; }
+.l1-header .sub { font-size:13px; color:var(--dim); margin-top:4px; }
+
+.group { margin-bottom:32px; }
+.group-header {
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  padding:10px 16px; background:var(--surface); border-radius:8px;
+  border-left:3px solid var(--accent);
+}
+.group-name { font-size:14px; font-weight:700; }
+.group-count {
+  font-size:10px; font-weight:600; padding:3px 8px; border-radius:10px;
+  background:var(--surface2); color:var(--dim); letter-spacing:.3px;
+}
+
+.screen-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; }
+.card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; cursor:pointer; transition:all .2s; position:relative;
+  display:flex; flex-direction:column;
+}
+.card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 16px #00000044; }
+.card.is-main { border-left:3px solid var(--main-color); }
+
+.card-thumb {
+  width:100%; aspect-ratio:16/9; background:var(--surface2);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--dim); font-size:10px; overflow:hidden;
+  border-bottom:1px solid var(--border); position:relative;
+}
+.card-thumb .ph { opacity:0.3; }
+.card-type {
+  position:absolute; top:8px; right:8px; font-size:9px; font-weight:700;
+  padding:3px 8px; border-radius:6px; letter-spacing:.3px; z-index:1;
+}
+.card-type.main { background:var(--main-color); color:#fff; }
+.card-type.popup { background:#30363d; color:var(--dim); }
+
+.card-body { padding:12px 14px 8px; flex:1; }
+.card-name { font-size:13px; font-weight:700; margin-bottom:3px; line-height:1.3; }
+.card-desc { font-size:11px; color:var(--dim); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+.card-meta {
+  padding:8px 14px 10px; border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:6px;
+}
+.card-prefab {
+  font-size:10px; color:var(--accent); font-family:'Cascadia Code',Consolas,monospace;
+  opacity:.7; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.status-badge {
+  position:absolute; top:8px; left:8px; font-size:9px; font-weight:700;
+  padding:3px 8px; border-radius:6px; z-index:2; letter-spacing:.3px;
+}
+.status-badge.s-needs-work { background:var(--status-red); color:#fff; }
+.status-badge.s-in-progress { background:var(--status-yellow); color:#000; }
+.status-badge.s-done { background:var(--status-green); color:#000; }
+.status-badge.s-outdated { background:var(--status-gray); color:var(--dim); }
+
+.status-filter {
+  display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center;
+}
+.status-filter-btn {
+  font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface); color:var(--dim);
+  transition:all .15s; font-weight:600;
+}
+.status-filter-btn:hover { border-color:var(--accent); color:var(--text); }
+.status-filter-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* 모달 */
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:#000000bb; z-index:200;
+  justify-content:center; align-items:center; padding:40px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  max-width:760px; width:100%; max-height:85vh; overflow-y:auto; position:relative;
+  box-shadow:0 20px 60px #00000088;
+}
+.modal-close {
+  position:absolute; top:14px; right:18px; background:var(--surface2); border:1px solid var(--border);
+  color:var(--dim); font-size:16px; cursor:pointer; width:32px; height:32px;
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  transition:all .15s; z-index:1;
+}
+.modal-close:hover { color:var(--text); border-color:var(--accent); }
+.modal-body { padding:24px 28px; }
+.modal-header { margin-bottom:16px; }
+.modal-title { font-size:18px; font-weight:700; margin-bottom:6px; letter-spacing:-.3px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.modal-desc { font-size:13px; color:var(--dim); line-height:1.6; }
+.modal-meta {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  padding:14px 16px; background:var(--bg); border-radius:10px;
+  margin-bottom:16px; border:1px solid var(--border);
+}
+.modal-meta-item { display:flex; flex-direction:column; gap:2px; }
+.modal-meta-item .ml { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+.modal-meta-item .mv { font-size:12px; font-family:'Cascadia Code',Consolas,monospace; }
+.modal-section {
+  font-size:11px; font-weight:700; color:var(--dim); margin:20px 0 10px;
+  padding-top:16px; border-top:1px solid var(--border);
+  text-transform:uppercase; letter-spacing:.8px;
+}
+
+/* 상태 편집 */
+.edit-form { padding:16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; }
+.edit-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.edit-row:last-child { margin-bottom:0; }
+.edit-label { font-size:11px; font-weight:600; color:var(--dim); min-width:64px; text-transform:uppercase; letter-spacing:.5px; }
+.edit-select, .edit-input {
+  flex:1; padding:6px 10px; font-size:12px;
+  background:var(--surface); border:1px solid var(--border); border-radius:6px;
+  color:var(--text); outline:none; font-family:inherit;
+}
+.edit-select:focus, .edit-input:focus { border-color:var(--accent); }
+.edit-save-btn {
+  padding:7px 20px; font-size:12px; font-weight:700;
+  background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer;
+}
+.edit-save-btn:hover { opacity:0.85; }
+.edit-msg { font-size:11px; margin-left:8px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 인덱스 뷰 -->
+<!-- ══════════════════════════════════════ -->
+<div id="view-index">
+  <div class="page">
+    <div class="l0-header">
+      <h1>DFKD UI 카탈로그</h1>
+      <div class="sub" id="sub-info"><span class="loading-spinner"></span>데이터 불러오는 중...</div>
+    </div>
+    <div class="l0-stats" id="stats"></div>
+    <div class="cat-grid" id="grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 카테고리 뷰 -->
+<!-- ══════════════════════════════════════ -->
+<div id="view-category" class="hidden">
+  <div class="back-bar">
+    <a class="back-btn" href="#" onclick="navigateTo('index'); return false;">&#8592; 목록</a>
+    <span class="current-path" id="cat-title"></span>
+  </div>
+  <div class="page">
+    <div class="l1-header">
+      <h2 id="cat-heading"></h2>
+      <div class="sub" id="cat-sub"></div>
+    </div>
+    <div class="status-filter" id="status-counts"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// 설정
+// ══════════════════════════════════════
+var API_URL = '__API_URL__'; // Apps Script 배포 URL
+
+// ══════════════════════════════════════
+// 전역 데이터 (첫 로드 시 한번에 가져옴)
+// ══════════════════════════════════════
+var DATA = {
+  categories: null,
+  entries: null,
+  statuses: null,
+  loaded: false
+};
+
+var STATUS_MAP = {
+  '수정필요': { cls:'s-needs-work', label:'수정필요' },
+  '작업중': { cls:'s-in-progress', label:'작업중' },
+  '완료': { cls:'s-done', label:'완료' },
+  '이전시안': { cls:'s-outdated', label:'이전시안' }
+};
+
+// ══════════════════════════════════════
+// 데이터 로드 (한 번만)
+// ══════════════════════════════════════
+async function loadAllData() {
+  if (DATA.loaded) return;
+
+  try {
+    var res = await fetch(API_URL + '?api=all');
+    var json = await res.json();
+    DATA.categories = json.categories || [];
+    DATA.entries = json.entries || [];
+    DATA.statuses = {};
+    (json.statuses || []).forEach(function(r) {
+      if (r['UI이름']) DATA.statuses[r['UI이름']] = r;
+    });
+    DATA.loaded = true;
+  } catch(e) {
+    document.getElementById('sub-info').innerHTML = '<span style="color:var(--red)">데이터 로드 실패: ' + escHtml(e.message) + '</span>';
+  }
+}
+
+// ══════════════════════════════════════
+// SPA 라우터
+// ══════════════════════════════════════
+function navigateTo(page, pushState) {
+  if (pushState !== false) {
+    history.pushState({ page: page }, '', page === 'index' ? '?' : '?page=' + encodeURIComponent(page));
+  }
+
+  if (page === 'index') {
+    document.getElementById('view-index').classList.remove('hidden');
+    document.getElementById('view-category').classList.add('hidden');
+    renderIndex();
+  } else {
+    document.getElementById('view-index').classList.add('hidden');
+    document.getElementById('view-category').classList.remove('hidden');
+    renderCategory(page);
+  }
+
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('popstate', function(e) {
+  var page = (e.state && e.state.page) || getPageFromUrl();
+  navigateTo(page, false);
+});
+
+function getPageFromUrl() {
+  var params = new URLSearchParams(window.location.search);
+  return params.get('page') || 'index';
+}
+
+// ══════════════════════════════════════
+// 유틸
+// ══════════════════════════════════════
+function escHtml(s) {
+  if (!s) return '';
+  var d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+// ══════════════════════════════════════
+// 인덱스 렌더링
+// ══════════════════════════════════════
+function renderIndex() {
+  if (!DATA.loaded) return;
+
+  var cats = DATA.categories;
+  if (!cats.length) {
+    document.getElementById('grid').innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+    return;
+  }
+
+  var totalUI = cats.reduce(function(s, c) { return s + Number(c.count || 0); }, 0);
+  var totalCat = cats.length;
+
+  document.getElementById('sub-info').textContent = totalUI + '개 등록된 UI · ' + totalCat + '개 카테고리';
+
+  document.getElementById('stats').innerHTML =
+    '<div class="l0-stat"><div class="num">' + totalUI + '</div><div class="label">Total UI</div></div>' +
+    '<div class="l0-stat"><div class="num">' + totalCat + '</div><div class="label">Categories</div></div>';
+
+  var html = '';
+  cats.forEach(function(cat) {
+    html += '<a class="cat-card" href="?page=' + encodeURIComponent(cat.slug) + '" onclick="navigateTo(\'' + escHtml(cat.slug) + '\'); return false;">' +
+      '<div class="cat-name">' + escHtml(cat.category) + '</div>' +
+      '<div class="cat-count">' + cat.count + '개 화면</div>' +
+      '<div class="cat-badge">상세</div>' +
+      '</a>';
+  });
+  document.getElementById('grid').innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// 카테고리 렌더링
+// ══════════════════════════════════════
+var currentEntries = [];
+
+function renderCategory(slug) {
+  if (!DATA.loaded) return;
+
+  var catInfo = DATA.categories.find(function(c) { return c.slug === slug; });
+  currentEntries = DATA.entries.filter(function(e) { return e.slug === slug; });
+
+  if (!currentEntries.length) {
+    document.getElementById('content').innerHTML = '<div class="loading">데이터가 없습니다.</div>';
+    return;
+  }
+
+  var catName = catInfo ? catInfo.category : slug;
+  document.getElementById('cat-title').textContent = catName;
+  document.getElementById('cat-heading').textContent = catName;
+  document.title = 'DFKD UI 카탈로그 - ' + catName;
+
+  var mainCount = currentEntries.filter(function(e) { return e.type === 'main'; }).length;
+  var popupCount = currentEntries.length - mainCount;
+
+  // 그룹별 분류
+  var groups = {};
+  var groupOrder = [];
+  currentEntries.forEach(function(e) {
+    var g = e.group || '기타';
+    if (!groups[g]) { groups[g] = []; groupOrder.push(g); }
+    groups[g].push(e);
+  });
+
+  document.getElementById('cat-sub').textContent =
+    currentEntries.length + '개 화면 (메인 ' + mainCount + ' · 팝업 ' + popupCount + ') · ' + groupOrder.length + '개 그룹';
+
+  var html = '';
+  groupOrder.forEach(function(groupName) {
+    var items = groups[groupName];
+    html += '<div class="group">';
+    html += '<div class="group-header">';
+    html += '<div class="group-name">' + escHtml(groupName) + '</div>';
+    html += '<div class="group-count">' + items.length + '개</div>';
+    html += '</div>';
+    html += '<div class="screen-grid">';
+
+    items.forEach(function(e) {
+      var isMain = e.type === 'main';
+      var statusInfo = DATA.statuses[e.uiType];
+      var statusBadge = '';
+
+      if (statusInfo && statusInfo['상태'] && STATUS_MAP[statusInfo['상태']]) {
+        var sm = STATUS_MAP[statusInfo['상태']];
+        statusBadge = '<div class="status-badge ' + sm.cls + '">' + sm.label + '</div>';
+      }
+
+      html += '<div class="card' + (isMain ? ' is-main' : '') + '" ' +
+        'data-uitype="' + escHtml(e.uiType) + '" onclick="openModal(this)">';
+      html += '<div class="card-thumb">';
+      html += statusBadge;
+      html += '<span class="ph">스크린샷</span>';
+      html += '<div class="card-type ' + (isMain ? 'main' : 'popup') + '">' + (isMain ? '메인' : '팝업') + '</div>';
+      html += '</div>';
+      html += '<div class="card-body">';
+      html += '<div class="card-name">' + escHtml(e.nameKR) + '</div>';
+      html += '<div class="card-desc">' + escHtml(e.descKR) + '</div>';
+      html += '</div>';
+      html += '<div class="card-meta">';
+      html += '<div class="card-prefab">' + escHtml(e.prefab) + '</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  document.getElementById('content').innerHTML = html;
+  updateStatusCounts();
+}
+
+function updateStatusCounts() {
+  var counts = { '수정필요':0, '작업중':0, '완료':0, '이전시안':0 };
+  currentEntries.forEach(function(e) {
+    var si = DATA.statuses[e.uiType];
+    if (si && si['상태'] && counts.hasOwnProperty(si['상태'])) counts[si['상태']]++;
+  });
+  var h = '';
+  var hasAny = false;
+  for (var k in counts) {
+    if (counts[k] > 0) {
+      hasAny = true;
+      h += '<span class="status-filter-btn" data-filter="' + k + '" onclick="filterByStatus(this)">' + k + ' (' + counts[k] + ')</span>';
+    }
+  }
+  if (hasAny) {
+    document.getElementById('status-counts').innerHTML =
+      '<span style="font-size:11px;color:var(--dim);margin-right:4px;">상태:</span>' +
+      '<span class="status-filter-btn active" data-filter="all" onclick="filterByStatus(this)">전체</span>' + h;
+  } else {
+    document.getElementById('status-counts').innerHTML = '';
+  }
+}
+
+var activeFilter = 'all';
+function filterByStatus(btn) {
+  activeFilter = btn.dataset.filter;
+  document.querySelectorAll('.status-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.card[data-uitype]').forEach(function(card) {
+    var si = DATA.statuses[card.dataset.uitype];
+    var st = si && si['상태'] ? si['상태'] : '';
+    card.style.display = (activeFilter === 'all' || st === activeFilter) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════
+// 모달
+// ══════════════════════════════════════
+function openModal(cardEl) {
+  var uitype = cardEl.dataset.uitype;
+  var entry = currentEntries.find(function(e) { return e.uiType === uitype; });
+  if (!entry) return;
+
+  var isMain = entry.type === 'main';
+  var typeLabel = isMain ?
+    '<span class="card-type main" style="position:static;display:inline-block;">메인</span>' :
+    '<span class="card-type popup" style="position:static;display:inline-block;">팝업</span>';
+
+  var statusInfo = DATA.statuses[uitype];
+  var statusHtml = '';
+  if (statusInfo && statusInfo['상태'] && STATUS_MAP[statusInfo['상태']]) {
+    var sm = STATUS_MAP[statusInfo['상태']];
+    statusHtml = ' <span class="status-badge ' + sm.cls + '" style="position:static;display:inline-block;">' + sm.label + '</span>';
+  }
+
+  var h = '<div class="modal-header">';
+  h += '<div class="modal-title">' + escHtml(entry.nameKR) + ' ' + typeLabel + statusHtml + '</div>';
+  h += '<div class="modal-desc">' + escHtml(entry.descKR) + '</div>';
+  if (statusInfo && statusInfo['메모']) {
+    h += '<div style="margin-top:8px;padding:8px 12px;background:#f8514915;border:1px solid #f8514933;border-radius:6px;font-size:12px;color:var(--status-red);">';
+    h += '<strong>메모:</strong> ' + escHtml(statusInfo['메모']) + '</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="modal-meta">';
+  h += '<div class="modal-meta-item"><span class="ml">UI Type</span><span class="mv" style="color:var(--accent)">' + escHtml(entry.uiType) + '</span></div>';
+  h += '<div class="modal-meta-item"><span class="ml">프리팹</span><span class="mv">' + escHtml(entry.prefab) + '</span></div>';
+  h += '<div class="modal-meta-item"><span class="ml">타입</span><span class="mv">' + (isMain ? '메인 화면' : '팝업') + '</span></div>';
+  h += '<div class="modal-meta-item"><span class="ml">그룹</span><span class="mv">' + escHtml(entry.group) + '</span></div>';
+  if (entry.viewFile) {
+    h += '<div class="modal-meta-item" style="grid-column:1/-1"><span class="ml">View 파일</span><span class="mv" style="font-size:10px;">' + escHtml(entry.viewFile) + '</span></div>';
+  }
+  h += '</div>';
+
+  var cur = statusInfo || {};
+  h += '<div class="modal-section">상태 관리</div>';
+  h += '<div class="edit-form">';
+  h += '<div class="edit-row"><label class="edit-label">상태</label>';
+  h += '<select class="edit-select" id="edit-status">';
+  h += '<option value=""' + (!cur['상태'] ? ' selected' : '') + '>미설정</option>';
+  ['수정필요','작업중','완료','이전시안'].forEach(function(s) {
+    h += '<option value="' + s + '"' + (cur['상태'] === s ? ' selected' : '') + '>' + s + '</option>';
+  });
+  h += '</select></div>';
+  h += '<div class="edit-row"><label class="edit-label">담당자</label>';
+  h += '<input class="edit-input" id="edit-assignee" value="' + escHtml(cur['담당자'] || '') + '" placeholder="이름"></div>';
+  h += '<div class="edit-row"><label class="edit-label">메모</label>';
+  h += '<input class="edit-input" id="edit-note" value="' + escHtml(cur['메모'] || '') + '" placeholder="수정 지시사항 등"></div>';
+  h += '<div class="edit-row"><label class="edit-label">수정안</label>';
+  h += '<input class="edit-input" id="edit-layout" value="' + escHtml(cur['수정안URL'] || '') + '" placeholder="Google Drive 이미지 링크"></div>';
+  h += '<div class="edit-row"><button class="edit-save-btn" onclick="saveStatus(\'' + escHtml(uitype) + '\')">저장</button>';
+  h += '<span class="edit-msg" id="edit-msg"></span></div>';
+  h += '</div>';
+
+  document.getElementById('modal-body').innerHTML = h;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+async function saveStatus(uitype) {
+  var msg = document.getElementById('edit-msg');
+  msg.textContent = '저장 중...';
+  msg.style.color = 'var(--dim)';
+
+  var payload = {
+    'UI이름': uitype,
+    '상태': document.getElementById('edit-status').value,
+    '담당자': document.getElementById('edit-assignee').value,
+    '메모': document.getElementById('edit-note').value,
+    '수정안URL': document.getElementById('edit-layout').value
+  };
+
+  try {
+    var res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    var result = await res.json();
+    if (result.ok) {
+      msg.textContent = '저장 완료';
+      msg.style.color = 'var(--green)';
+      // 메모리 내 상태 즉시 반영
+      DATA.statuses[uitype] = Object.assign({}, DATA.statuses[uitype] || {}, payload);
+    } else {
+      msg.textContent = '오류: ' + (result.error || '알 수 없음');
+      msg.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    msg.textContent = '네트워크 오류';
+    msg.style.color = 'var(--red)';
+  }
+}
+
+// ══════════════════════════════════════
+// 초기화
+// ══════════════════════════════════════
+(async function init() {
+  await loadAllData();
+  navigateTo(getPageFromUrl(), false);
+})();
+</script>
+</body>
+</html>
