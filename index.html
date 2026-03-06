@@ -350,6 +350,18 @@ function driveThumbUrl(url, size) {
   return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w' + size;
 }
 
+// URL 타입 판별: 이미지(Drive/직접) vs 일반 링크
+function isImageUrl(url) {
+  if (!url) return false;
+  var s = String(url).trim().toLowerCase();
+  // Drive 링크 또는 이미지 확장자
+  if (s.indexOf('drive.google.com') !== -1) return true;
+  if (/\.(png|jpg|jpeg|gif|webp|bmp)(\?|$)/i.test(s)) return true;
+  // 순수 Drive ID (영숫자+하이픈+언더스코어, 10자 이상)
+  if (/^[a-zA-Z0-9_-]{10,}$/.test(url.trim())) return true;
+  return false;
+}
+
 // 카테고리별 상태 집계
 function getStatusCountsBySlug(slug) {
   var entries = DATA.entries.filter(function(e) { return e.slug === slug; });
@@ -592,14 +604,23 @@ function openModal(cardEl) {
   }
   h += '</div>';
 
-  // 수정안 이미지 (있으면 표시)
+  // 수정안 참고자료 (이미지 또는 링크)
   if (statusInfo && statusInfo['수정안URL']) {
-    var refThumb = driveThumbUrl(statusInfo['수정안URL'], 800);
-    if (refThumb) {
-      h += '<div class="modal-section">수정안 참고 이미지</div>';
-      h += '<div class="modal-screenshot">';
-      h += '<img src="' + escHtml(refThumb) + '" onerror="this.parentElement.innerHTML=\'<div class=no-img>이미지를 불러올 수 없습니다</div>\'">';
-      h += '</div>';
+    var refUrl = String(statusInfo['수정안URL']).trim();
+    if (isImageUrl(refUrl)) {
+      var refThumb = driveThumbUrl(refUrl, 800);
+      if (refThumb) {
+        h += '<div class="modal-section">수정안 참고 이미지</div>';
+        h += '<div class="modal-screenshot">';
+        h += '<img src="' + escHtml(refThumb) + '" onerror="this.parentElement.innerHTML=\'<div class=no-img>이미지를 불러올 수 없습니다</div>\'">';
+        h += '</div>';
+      }
+    } else {
+      h += '<div class="modal-section">수정안 참고자료</div>';
+      h += '<div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;">';
+      h += '<a href="' + escHtml(refUrl) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;">';
+      h += '&#128196; 기획서 열기 <span style="font-size:11px;color:var(--dim);font-weight:400;">' + escHtml(refUrl.length > 60 ? refUrl.substring(0, 57) + '...' : refUrl) + '</span>';
+      h += '</a></div>';
     }
   }
 
@@ -618,7 +639,7 @@ function openModal(cardEl) {
   h += '<div class="edit-row"><label class="edit-label">메모</label>';
   h += '<input class="edit-input" id="edit-note" value="' + escHtml(cur['메모'] || '') + '" placeholder="수정 지시사항 등"></div>';
   h += '<div class="edit-row"><label class="edit-label">수정안</label>';
-  h += '<input class="edit-input" id="edit-layout" value="' + escHtml(cur['수정안URL'] || '') + '" placeholder="수정 참고 이미지 (Drive 링크)"></div>';
+  h += '<input class="edit-input" id="edit-layout" value="' + escHtml(cur['수정안URL'] || '') + '" placeholder="기획서 URL 또는 참고 이미지 (Drive 링크)"></div>';
   h += '<div class="edit-row"><label class="edit-label">스크린샷</label>';
   h += '<input class="edit-input" id="edit-screenshot" value="' + escHtml(cur['스크린샷URL'] || '') + '" placeholder="현재 UI 스크린샷 (Drive 링크)"></div>';
   h += '<div class="edit-row"><button class="edit-save-btn" onclick="saveStatus(\'' + escHtml(uitype) + '\')">저장</button>';
@@ -652,7 +673,15 @@ async function saveStatus(uitype) {
     if (result.ok) {
       msg.textContent = '저장 완료';
       msg.style.color = 'var(--green)';
+      // 로컬 데이터 즉시 반영
       DATA.statuses[uitype] = Object.assign({}, DATA.statuses[uitype] || {}, payload);
+      // 1초 뒤 모달 닫고 화면 재렌더링
+      setTimeout(function() {
+        closeModal();
+        var page = getPageFromUrl();
+        if (page === 'index') renderIndex();
+        else renderCategory(page);
+      }, 800);
     } else {
       msg.textContent = '오류: ' + (result.error || '알 수 없음');
       msg.style.color = 'var(--red)';
