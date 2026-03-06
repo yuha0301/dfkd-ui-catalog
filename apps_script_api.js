@@ -112,6 +112,7 @@ function doPost(e) {
   if (data['담당자'] !== undefined) sheet.getRange(rowIdx, 5).setValue(data['담당자']);
   if (data['메모'] !== undefined) sheet.getRange(rowIdx, 6).setValue(data['메모']);
   if (data['수정안URL'] !== undefined) sheet.getRange(rowIdx, 7).setValue(data['수정안URL']);
+  if (data['스크린샷URL'] !== undefined) sheet.getRange(rowIdx, 10).setValue(data['스크린샷URL']);
 
   var today = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
   sheet.getRange(rowIdx, 8).setValue(today);
