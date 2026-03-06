@@ -656,9 +656,10 @@ function openModal(cardEl) {
 
   document.getElementById('modal-body').innerHTML = h;
   document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); document.body.style.overflow = ''; }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
 async function saveStatus(uitype) {
