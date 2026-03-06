@@ -493,6 +493,8 @@ function renderCategory(slug) {
     html += '</div>';
     html += '<div class="screen-grid">';
 
+    // 그룹 내에서도 main을 앞으로
+    items.sort(function(a, b) { return (a.type === 'main' ? 0 : 1) - (b.type === 'main' ? 0 : 1); });
     items.forEach(function(e) {
       var isMain = e.type === 'main';
       var statusInfo = DATA.statuses[e.uiType];
