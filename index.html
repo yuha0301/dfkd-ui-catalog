@@ -202,6 +202,13 @@ body { font-family:'Pretendard',-apple-system,'Segoe UI',sans-serif; background:
 }
 .edit-save-btn:hover { opacity:0.85; }
 .edit-msg { font-size:11px; margin-left:8px; }
+.refresh-btn {
+  background:none; border:1px solid var(--border); color:var(--dim);
+  font-size:16px; width:30px; height:30px; border-radius:6px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .15s;
+}
+.refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
+.refresh-btn.spinning { animation:spin .6s linear infinite; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -212,7 +219,7 @@ body { font-family:'Pretendard',-apple-system,'Segoe UI',sans-serif; background:
 <div id="view-index">
   <div class="page">
     <div class="l0-header">
-      <h1>DFKD UI 카탈로그</h1>
+      <h1 style="display:flex;align-items:center;gap:10px;">DFKD UI 카탈로그 <button class="refresh-btn" onclick="forceRefresh()" title="데이터 새로고침">&#8635;</button></h1>
       <div class="sub" id="sub-info"><span class="loading-spinner"></span>데이터 불러오는 중...</div>
     </div>
     <div class="l0-stats" id="stats"></div>
@@ -227,6 +234,7 @@ body { font-family:'Pretendard',-apple-system,'Segoe UI',sans-serif; background:
   <div class="back-bar">
     <a class="back-btn" href="#" onclick="navigateTo('index'); return false;">&#8592; 목록</a>
     <span class="current-path" id="cat-title"></span>
+    <button class="refresh-btn" onclick="forceRefresh()" title="데이터 새로고침" style="margin-left:auto;">&#8635;</button>
   </div>
   <div class="page">
     <div class="l1-header">
@@ -690,6 +698,23 @@ async function saveStatus(uitype) {
     msg.textContent = '네트워크 오류';
     msg.style.color = 'var(--red)';
   }
+}
+
+// ══════════════════════════════════════
+// 강제 갱신
+// ══════════════════════════════════════
+async function forceRefresh() {
+  var btns = document.querySelectorAll('.refresh-btn');
+  btns.forEach(function(b) { b.classList.add('spinning'); });
+
+  DATA.loaded = false;
+  await loadAllData();
+
+  btns.forEach(function(b) { b.classList.remove('spinning'); });
+
+  var page = getPageFromUrl();
+  if (page === 'index') renderIndex();
+  else renderCategory(page);
 }
 
 // ══════════════════════════════════════
